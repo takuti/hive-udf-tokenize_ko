@@ -1,0 +1,8 @@
+*.iml
+
+.idea/
+target/
+
+mecab/
+mecab-*/
+mecab-*.tar.gz
