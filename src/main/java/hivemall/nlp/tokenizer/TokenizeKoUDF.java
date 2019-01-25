@@ -19,16 +19,13 @@
 package hivemall.nlp.tokenizer;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import hivemall.nlp.utils.ko.MeCabKoTokenizer;
-import hivemall.nlp.utils.ko.StandardPosAppender;
-import hivemall.nlp.utils.ko.TokenGenerator;
-import hivemall.nlp.utils.ko.TokenizerOption;
+import hivemall.nlp.utils.ko.KoreanAnalyzer;
 
+import hivemall.utils.io.IOUtils;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -38,8 +35,10 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.Text;
-import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
+import javax.annotation.Nonnull;
 
 @Description(name = "tokenize_ko",
         value = "_FUNC_(String line)"
@@ -50,8 +49,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 @UDFType(deterministic = true, stateful = false)
 public final class TokenizeKoUDF extends GenericUDF {
 
-    private Tokenizer tokenizer;
-    private TokenizerOption option;
+    private transient KoreanAnalyzer analyzer;
 
     @Override
     public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
@@ -61,10 +59,7 @@ public final class TokenizeKoUDF extends GenericUDF {
                     "Invalid number of arguments for `tokenize_ko`: " + arglen);
         }
 
-        this.tokenizer = null;
-
-        this.option = new TokenizerOption();
-        option.compoundNounMinLength = TokenGenerator.DEFAULT_COMPOUND_NOUN_MIN_LENGTH;
+        this.analyzer = null;
 
         return ObjectInspectorFactory.getStandardListObjectInspector(
                 PrimitiveObjectInspectorFactory.writableStringObjectInspector);
@@ -72,10 +67,8 @@ public final class TokenizeKoUDF extends GenericUDF {
 
     @Override
     public List<Text> evaluate(DeferredObject[] arguments) throws HiveException {
-        if (tokenizer == null) {
-            this.tokenizer = new MeCabKoTokenizer(
-                    option,
-                    new StandardPosAppender(option));
+        if (analyzer == null) {
+            this.analyzer = new KoreanAnalyzer();
         }
 
         Object arg0 = arguments[0].get();
@@ -83,28 +76,38 @@ public final class TokenizeKoUDF extends GenericUDF {
             return null;
         }
 
-        CharTermAttribute term = tokenizer.addAttribute(CharTermAttribute.class);
-        final List<Text> tokens = new ArrayList<Text>();
+        String line = arg0.toString();
 
+        final List<Text> tokens = new ArrayList<Text>(32);
+        TokenStream stream = null;
         try {
-            tokenizer.setReader(new StringReader(arg0.toString()));
-            tokenizer.reset();
-            while (tokenizer.incrementToken() == true) {
-                String word = new String(term.buffer(), 0, term.length());
-                tokens.add(new Text(word));
+            stream = analyzer.tokenStream("", line);
+            if (stream != null) {
+                analyzeTokens(stream, tokens);
             }
-            tokenizer.end();
         } catch (IOException e) {
-            throw new HiveException("Failed to tokenize the sentence: " + e.getMessage());
+            IOUtils.closeQuietly(analyzer);
+            throw new HiveException(e);
+        } finally {
+            IOUtils.closeQuietly(stream);
         }
-
         return tokens;
     }
 
     @Override
     public void close() throws IOException {
-        if (tokenizer != null) {
-            tokenizer.close();
+        IOUtils.closeQuietly(analyzer);
+    }
+
+    private static void analyzeTokens(@Nonnull TokenStream stream, @Nonnull List<Text> results)
+            throws IOException {
+        // instantiate an attribute placeholder once
+        CharTermAttribute termAttr = stream.getAttribute(CharTermAttribute.class);
+        stream.reset();
+
+        while (stream.incrementToken()) {
+            String term = termAttr.toString();
+            results.add(new Text(term));
         }
     }
 

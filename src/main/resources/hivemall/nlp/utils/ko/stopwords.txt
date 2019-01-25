@@ -1,0 +1,2 @@
+# List of default stop worlds for Korean language
+# TODO: Fill with reasonable words
