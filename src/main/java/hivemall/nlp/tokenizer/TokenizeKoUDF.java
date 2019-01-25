@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import hivemall.nlp.utils.ko.KoreanAnalyzer;
+import hivemall.nlp.analysis.ko.KoreanAnalyzer;
 
 import hivemall.utils.io.IOUtils;
 import org.apache.hadoop.hive.ql.exec.Description;
