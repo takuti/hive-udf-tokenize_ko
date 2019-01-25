@@ -18,10 +18,10 @@ package hivemall.nlp.analysis.ko;
 import java.util.Map;
 
 /**
- * 문서 유사도 측정용 tokenizer 팩토리 생성자. 다음과 같은 파라미터를 받는다. (실험적인)
- *   - mecabArgs: mecab 실행옵션. 디폴트 값은 "-d /usr/local/lib/mecab/dic/mecab-ko-dic/" 이다.
- *     mecab 실행 옵션은 다음의 URL을 참조. http://mecab.googlecode.com/svn/trunk/mecab/doc/mecab.html
- *   - compoundNounMinLength: 분해를 해야하는 복합명사의 최소 길이. 디폴트 값은 9999이다. (복합명사 분해 안함)
+ * A tokenizer factory constructor for measuring document similarity. It takes the following parameters. (Experimental)
+ *   - mecabArgs: mecab run option. The default value is "-d /usr/local/lib/mecab/dic/mecab-ko-dic/".
+ *     See the following URL for mecab execution options. http://mecab.googlecode.com/svn/trunk/mecab/doc/mecab.html
+ *   - compoundNounMinLength: The minimum length of the compound noun to be decomposed. The default value is 9999. (Not compound noun decomposition)
  *
  * <pre>
  * {@code

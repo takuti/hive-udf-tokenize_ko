@@ -18,7 +18,7 @@ package hivemall.nlp.analysis.ko;
 import hivemall.nlp.analysis.ko.PosIdManager.PosId;
 
 /**
- * 연접 가능한 PosId를 저장하는 클래스
+ * Class to store PosIDs that can be concatenated
  */
 public class Appendable {
   private PosId left;

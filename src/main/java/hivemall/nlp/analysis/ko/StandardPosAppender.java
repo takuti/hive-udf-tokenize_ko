@@ -23,7 +23,7 @@ import java.util.Set;
 import hivemall.nlp.analysis.ko.util.XpnDiscriminator;
 
 /**
- * 표준 tokenizer를 위한 PosAppender.
+ * PosAppender for standard tokenizer.
  *
  * @author bibreen <bibreen@gmail.com>
  * @author amitabul <mousegood@gmail.com>
@@ -34,14 +34,14 @@ public class StandardPosAppender extends PosAppender {
   static {
     appendableSet = new HashSet<Appendable>();
 
-    // Appenable HashSet 구성
-    // 사전에 없는 단어(UNKNOWN)은 체언이라고 가정한다.
+    // Configure Appendable HashSet
+    // Assume that a word that is not in the dictionary (UNKNOWN) is a clan.
 
-    // 어미(E) + 어미(E)
+    // The mother (E) + the mother (E)
     appendableSet.add(new Appendable(PosIdManager.PosId.E, PosIdManager.PosId.E));
-    // 어근(XR) + E [+ E]*
+    // Root (XR) + E [+ E]*
     appendableSet.add(new Appendable(PosIdManager.PosId.XR, PosIdManager.PosId.E));
-    // 용언(V*)|동사 파생 접미사(XSV)|형용사 파생 접미사(XSA) + E [+ E]*
+    // Adjective Derived Suffix (XSA) + E [+ E]* Adjective Derived Suffix (XSA)
     appendableSet.add(new Appendable(PosIdManager.PosId.VV, PosIdManager.PosId.E));
     appendableSet.add(new Appendable(PosIdManager.PosId.VA, PosIdManager.PosId.E));
     appendableSet.add(new Appendable(PosIdManager.PosId.VX, PosIdManager.PosId.E));
@@ -49,7 +49,7 @@ public class StandardPosAppender extends PosAppender {
     appendableSet.add(new Appendable(PosIdManager.PosId.VCN, PosIdManager.PosId.E));
     appendableSet.add(new Appendable(PosIdManager.PosId.XSV, PosIdManager.PosId.E));
     appendableSet.add(new Appendable(PosIdManager.PosId.XSA, PosIdManager.PosId.E));
-    // 체언(N*)|일반부사(MAG)|어근(XR) + 동사 파생 접미사(XSV)
+    // Cognition (N*) | General Adverb (MAG) | Root (XR) + Verb Derived Suffix (XSV)
     appendableSet.add(new Appendable(PosIdManager.PosId.NNG, PosIdManager.PosId.XSV));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNP, PosIdManager.PosId.XSV));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNB, PosIdManager.PosId.XSV));
@@ -60,7 +60,7 @@ public class StandardPosAppender extends PosAppender {
     appendableSet.add(new Appendable(PosIdManager.PosId.MAG, PosIdManager.PosId.XSV));
     appendableSet.add(new Appendable(PosIdManager.PosId.XR, PosIdManager.PosId.XSV));
     appendableSet.add(new Appendable(PosIdManager.PosId.UNKNOWN, PosIdManager.PosId.XSV));
-    // 체언(N*)|일반부사(MAG)|어근(XR) + 형용사 파생 접미사(XSA)
+    // Cognition (N*) | General Adverbs (MAG) | Root (XR) + Adjective Derived Suffix (XSA)
     appendableSet.add(new Appendable(PosIdManager.PosId.NNG, PosIdManager.PosId.XSA));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNP, PosIdManager.PosId.XSA));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNB, PosIdManager.PosId.XSA));
@@ -71,7 +71,7 @@ public class StandardPosAppender extends PosAppender {
     appendableSet.add(new Appendable(PosIdManager.PosId.MAG, PosIdManager.PosId.XSA));
     appendableSet.add(new Appendable(PosIdManager.PosId.XR, PosIdManager.PosId.XSA));
     appendableSet.add(new Appendable(PosIdManager.PosId.UNKNOWN, PosIdManager.PosId.XSA));
-    // 체언(N*)|명사 파생 접미사(XSN) + 긍정지정사(VCP)
+    // Censorship (N*) | Noun Derived Suffix (XSN) + Positive Assignment (VCP)
     appendableSet.add(new Appendable(PosIdManager.PosId.NNG, PosIdManager.PosId.VCP));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNP, PosIdManager.PosId.VCP));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNB, PosIdManager.PosId.VCP));
@@ -81,7 +81,7 @@ public class StandardPosAppender extends PosAppender {
     appendableSet.add(new Appendable(PosIdManager.PosId.COMPOUND, PosIdManager.PosId.VCP));
     appendableSet.add(new Appendable(PosIdManager.PosId.XSN, PosIdManager.PosId.VCP));
     appendableSet.add(new Appendable(PosIdManager.PosId.UNKNOWN, PosIdManager.PosId.VCP));
-    // 체언(N*) + 조사 [+ 조사]*
+    // Cheong (N *) + Survey [+ Survey]*
     appendableSet.add(new Appendable(PosIdManager.PosId.NNG, PosIdManager.PosId.J));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNP, PosIdManager.PosId.J));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNB, PosIdManager.PosId.J));
@@ -90,26 +90,26 @@ public class StandardPosAppender extends PosAppender {
     appendableSet.add(new Appendable(PosIdManager.PosId.NR, PosIdManager.PosId.J));
     appendableSet.add(new Appendable(PosIdManager.PosId.COMPOUND, PosIdManager.PosId.J));
     appendableSet.add(new Appendable(PosIdManager.PosId.UNKNOWN, PosIdManager.PosId.J));
-    // 체언 접두사(XPN) + 체언(N*)
+    // Cene prefix (XPN) + Clan (N*)
     appendableSet.add(new Appendable(PosIdManager.PosId.XPN, PosIdManager.PosId.NNG));
     appendableSet.add(new Appendable(PosIdManager.PosId.XPN, PosIdManager.PosId.NR));
     appendableSet.add(new Appendable(PosIdManager.PosId.XPN, PosIdManager.PosId.NP));
-    // 명사 파생 접미사(XSN) + 조사(J)
+    // Noun Derived Suffix (XSN) + Survey (J)
     appendableSet.add(new Appendable(PosIdManager.PosId.XSN, PosIdManager.PosId.J));
-    // 어미(E) + 조사(J) - 어미가 명사형 전성 어미인 경우
+    // Maternity (E) + Survey (J) - When the mother is a noun-
     appendableSet.add(new Appendable(PosIdManager.PosId.E, PosIdManager.PosId.J));
-    // 어미(E) + 보조 용언(VX) - 어미가 연결 어미인 경우
-    // '보조 용언은 띄어 씀을 원칙으로 하되, 경우에 따라 붙여 씀도 허용한다.'
+    // mother (E) + auxiliary verb (VX) - if the mother is the connecting mother
+    // 'Auxiliary verbs should be spelled out, but in some cases they may be pasted.'
     // (http://www.korean.go.kr/09_new/dic/rule/rule01_0503.jsp)
-    // 위와 같은 이유로 어미와 보조 용언는 붙이지 않는다.
-    // appendableSet.add(new Appendable(PosId.E, PosId.VX));
-    // 부사(MAG) + 조사(J)
+    // For the above reasons, neither mother nor auxiliary verbs are attached.
+    // appendableSet.add (new Appendable (PosId.E, PosId.VX));
+    // Adverb (MAG) + survey (J)
     appendableSet.add(new Appendable(PosIdManager.PosId.MAG, PosIdManager.PosId.J));
-    // 조사(J) + 조사(J)
+    // Survey (J) + Survey (J)
     appendableSet.add(new Appendable(PosIdManager.PosId.J, PosIdManager.PosId.J));
-    // 외국어(SL) + 조사(J)
+    // Foreign language (SL) + survey (J)
     appendableSet.add(new Appendable(PosIdManager.PosId.SL, PosIdManager.PosId.J));
-    // 한자(SH) + 조사(J)
+    // Hanja (SH) + Survey (J)
     appendableSet.add(new Appendable(PosIdManager.PosId.SH, PosIdManager.PosId.J));
   }
 
@@ -128,7 +128,7 @@ public class StandardPosAppender extends PosAppender {
 
   @Override
   public boolean isSkippablePos(Pos pos) {
-    // 단독으로 쓰인 심볼은 token 생성 제외한다.
+    // Exclusive symbols are excluded from token generation.
     PosIdManager.PosId posId = pos.getPosId();
     return posId == PosIdManager.PosId.SF ||
         posId.in(PosIdManager.PosId.SP, PosIdManager.PosId.SE);
@@ -143,13 +143,14 @@ public class StandardPosAppender extends PosAppender {
   }
 
   /**
-   * 비독립적인 체언 접두사로 시작하는 경우, 뒤의 일반명사, 수사, 대명사와 합쳐서 새로운 명사를
-   * 만들어 넣는다
-   *   - 비/XPN + 정상/NNG -> 비정상/NNG
-   * 독립적으로 사용되는 체언 접두사(XpnDiscriminator에 정의)인 경우 복합명사가 포함된 것으로
-   * 설정해서 접두사와 체언이 복합명사의 로직으로 인덱싱한다.
-   *   - 왕/XPN + 만두/NNG -> 왕/XPN         + 만두/NNG
-   *                        왕만두/COMPOUND
+   * When starting with a non-independent cognitive prefix, combine the following common nouns, rhetoric, and pronouns with new nouns
+   * Make up
+   * - Rain / XPN + Normal / NNG -> Abnormal / NNG
+   * Independent cognate prefixes (as defined in XpnDiscriminator) that contain compound nouns
+   * Set and index the prefix and chess with the logic of the compound noun.
+   * - King / XPN + Mandu / NNG -> King / XPN + Mandu / NNG
+   * KIMMAN DUPLE / COMPOUND
+   *
    * @param eojeol
    */
   private void preprocessXpn(Eojeol eojeol) {
@@ -180,7 +181,7 @@ public class StandardPosAppender extends PosAppender {
     LinkedList<Pos> poses = eojeol.getPosList();
     if (eojeol.hasCompoundNoun()) {
       LinkedList<Pos> output = new LinkedList<>();
-      // TODO: 이해하기 어려운 코드 리팩토링 해보자
+      // TODO: Let's refactor code that's hard to understand
       Pos prevPos = null;
       int numAbsolutePos = 0;
       for (Pos pos: poses) {
@@ -295,9 +296,9 @@ public class StandardPosAppender extends PosAppender {
   }
 
   /**
-   * 단독으로 쓰일 수 있는 형태소인지를 판단한다.
+   * Determine whether the morpheme can be used alone.
    *
-   * @param pos 형태소 품사.
+   * @param pos Morpheme part.
    */
   private boolean isAbsolutePos(Pos pos) {
     if (option.useAdjectiveAndVerbOriginalForm) {
@@ -332,10 +333,10 @@ public class StandardPosAppender extends PosAppender {
   }
 
   /**
-   * Infelct Pos에서 첫번째 pos를 가져온다.
+   * Get the first pos from the Inflect Pos.
    *
    * @param inflectPos
-   * @return pos 형태소 품사
+   * @return pos morpheme part
    */
   private Pos extractFirstPos(Pos inflectPos) {
     if (!inflectPos.isPosIdOf(PosIdManager.PosId.INFLECT)) {

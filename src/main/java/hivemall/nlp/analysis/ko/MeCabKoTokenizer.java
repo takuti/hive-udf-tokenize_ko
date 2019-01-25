@@ -32,7 +32,7 @@ import org.chasen.mecab.Model;
 import org.chasen.mecab.Tagger;
 
 /**
- * Lucene/Solr용 Tokenizer.
+ * Tokenizer for Lucene/Solr.
  *
  * @author bibreen <bibreen@gmail.com>
  * @author amitabul <mousegood@gmail.com>
@@ -56,12 +56,12 @@ public final class MeCabKoTokenizer extends Tokenizer {
   private Queue<Pos> tokensQueue;
 
   /**
-   * MeCabKoTokenizer 생성자.
-   * Default AttributeFactory 사용.
+   * MeCabKoTokenizer constructor.
+   * Use the Default AttributeFactory.
    *
-   * @param option Tokenizer 옵션
+   * @param option Tokenizer option
    * @param appender PosAppender
-   * 복합명사 분해가 필요없는 경우, TokenGenerator.NO_DECOMPOUND를 입력한다.
+   * If no compound noun decomposition is required, enter TokenGenerator.NO_DECOMPOUND.
    */
   public MeCabKoTokenizer(
       TokenizerOption option,
@@ -73,12 +73,12 @@ public final class MeCabKoTokenizer extends Tokenizer {
   }
 
   /**
-   * MeCabKoTokenizer 생성자.
+   * MeCabKoTokenizer constructor.
    *
    * @param factory the AttributeFactory to use
-   * @param option MeCabTokenizer 옵션
+   * @param option MeCabTokenizer option
    * @param appender PosAppender
-   * 복합명사 분해가 필요없는 경우, TokenGenerator.NO_DECOMPOUND를 입력한다.
+   * If no compound noun decomposition is required, enter TokenGenerator.NO_DECOMPOUND.
    */
   public MeCabKoTokenizer(
       AttributeFactory factory,

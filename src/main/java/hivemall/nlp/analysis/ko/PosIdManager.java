@@ -16,13 +16,13 @@
 package hivemall.nlp.analysis.ko;
 
 /**
- * mecab-ko-dic의 PosId를 관리하는 클래스
+ * Class to manage mecab-ko-dic PosId
  *
  * @author bibreen <bibreen@gmail.com>
  */
 public final class PosIdManager {
   /**
-   * PosId와 매핑되는 enum
+   * Enum mapped to PosId
    */
   public enum PosId {
     UNKNOWN(0),

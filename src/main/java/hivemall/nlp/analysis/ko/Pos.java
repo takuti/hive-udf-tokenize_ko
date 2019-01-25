@@ -18,7 +18,7 @@ package hivemall.nlp.analysis.ko;
 import org.chasen.mecab.Node;
 
 /**
- * 품사(형태소, 품사 ID, 위치 등) 정보 클래스
+ * Part of speech (morpheme, part-of-speech ID, location, etc.) Information class
  *
  * @author bibreen <bibreen@gmail.com>
  */
@@ -70,10 +70,10 @@ public class Pos {
   }
 
   /**
-   * mecab의 자료 구조인 node를 사용하는 Pos 생성자.
+   * A Pos constructor that uses node, the data structure of mecab.
    *
    * @param node Node
-   * @param prevEndOffset 이전 Pos의 end offset
+   * @param prevEndOffset End offset of previous Pos
    */
   public Pos(Node node, int prevEndOffset) {
     this(
@@ -86,10 +86,10 @@ public class Pos {
   }
 
   /**
-   * Pos를 표현하는 문자열을 받는 Pos 생성자.
-   * expression은 다음과 같이 구성된다.
+   * Pos constructor that receives a string representing Pos.
+   * expression is composed as follows.
    * '<surface>/<tag>/<semantic_class>'
-   * ex) 판교/NNP/지명
+   * ex) Pangyo/NNP/nomination
    */
   public Pos(String expression, int startOffset) {
     try {

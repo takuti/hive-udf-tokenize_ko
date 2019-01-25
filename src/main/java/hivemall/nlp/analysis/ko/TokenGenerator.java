@@ -21,7 +21,7 @@ import org.chasen.mecab.Node;
 import org.chasen.mecab.MeCab;
 
 /**
- * MeCab의 node를 받아서 Lucene tokenizer에 사용될 Pos 리스트를 생성하는 클래스.
+ * A class that creates a Pos list to be used in a Lucene tokenizer by receiving a node from MeCab.
  *
  * @author bibreen <bibreen@gmail.com>
  * @author amitabul <mousegood@gmail.com>
@@ -36,12 +36,12 @@ public class TokenGenerator {
   private int compoundNounMinLength;
 
   /**
-   * TokenGenerator 생성자
+   * TokenGenerator Constructor
    *
    * @param appender PosAppender
-   * @param compoundNounMinLength 복합명사에서 분해할 명사의 최소길이.
-   * 복합명사 분해가 필요없는 경우, TokenGenerator.NO_DECOMPOUND를 입력한다.
-   * @param beginNode 시작 노드
+   * @param compoundNounMinLength The minimum length of the noun to decompose in the compound noun.
+   * If no compound noun decomposition is required, enter TokenGenerator.NO_DECOMPOUND.
+   * @param beginNode starting node
    */
   public TokenGenerator(
       PosAppender appender, int compoundNounMinLength, Node beginNode) {
@@ -71,7 +71,7 @@ public class TokenGenerator {
   }
 
   /**
-   * mecab-ko-dic의 인덱스 표현 문자열을 해석하여 품사(Pos) 리스트를 반환한다.
+   * It interprets the index expression string of mecab-ko-dic and returns the pos list.
    */
   static public LinkedList<Pos> getAnalyzedPoses(Pos pos) {
     LinkedList<Pos> output = new LinkedList<Pos>();
@@ -89,7 +89,7 @@ public class TokenGenerator {
     for (String posExp: posExps) {
       output.add(new Pos(posExp, 0));
     }
-    // 분해된 POS의 offset 재계산
+    // Recalculate offset of disassembled POS
     Pos prevPos = null;
     for (Pos curPos: output) {
       if (prevPos == null) {
@@ -108,8 +108,8 @@ public class TokenGenerator {
   }
 
   /**
-   * 다음 어절의 Pos들을 반환한다.
-   * @return 반환 값이 null이면 generator 종료이다.
+   * Return the pos of the next word.
+   * @return If the return value is null, it is the end of the generator.
    */
   public LinkedList<Pos> getNextEojeolTokens() {
     Eojeol eojeol = new Eojeol(appender, compoundNounMinLength);

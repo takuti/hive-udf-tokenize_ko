@@ -22,7 +22,7 @@ import org.apache.lucene.util.AttributeFactory;
 import java.util.Map;
 
 /**
- * MeCabKo Tokenizer Factory 추상 클래스
+ * MeCabKo Tokenizer Factory abstract class
  * @author bibreen <bibreen@gmail.com>
  */
 public abstract class TokenizerFactoryBase extends TokenizerFactory {

@@ -16,16 +16,16 @@
 package hivemall.nlp.analysis.ko;
 
 /**
- * Tokenizer 옵션
+ * Tokenizer options
  */
 public class TokenizerOption {
   public static final int NO_DECOMPOUND = 9999;
 
-  /** mecab 실행옵션(ex: -d /usr/local/lib/mecab/dic/mecab-ko-dic/) */
+  /** mecab run options (ex: -d /usr/local/lib/mecab/dic/mecab-ko-dic/) */
   public String mecabArgs = "-d /usr/local/lib/mecab/dic/mecab-ko-dic/";
-  /** 분해를 해야하는 복합명사의 최소 길이. */
+  /** The minimum length of a compound noun to be decomposed. */
   public int compoundNounMinLength = 3;
-  /** 동사, 형용사 원형 검색 여부 */
+  /** Verb, adjective original search */
   public boolean useAdjectiveAndVerbOriginalForm = true;
   // boolean useHanjaRead = false;
 }

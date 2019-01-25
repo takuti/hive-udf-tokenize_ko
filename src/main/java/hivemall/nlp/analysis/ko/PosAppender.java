@@ -18,8 +18,7 @@ package hivemall.nlp.analysis.ko;
 import java.util.LinkedList;
 
 /**
- * TokenGenerator에서 token으로 뽑는 품사와 품사의 연접과 token으로 뽑는 품사의 선택
- * 알고리즘을 담당하는 추상 클래스.
+ * TokenGenerator is an abstract class that is responsible for selecting a token-based part-of-speech and a part-of-speech selection algorithm.
  *
  * @author bibreen <bibreen@gmail.com>
  */
@@ -31,15 +30,15 @@ public abstract class PosAppender {
   }
 
   /**
-   * left PosId와 right PosId가 어절의 형태로 붙을 수 있는 품사인지 여부를 반환한다.
+   * Returns whether left PosId and right PosId are parts of speech that can be attached in the form of a word.
    */
   public abstract boolean isAppendable(Pos left, Pos right);
   /**
-   * 해당 POS가 인덱싱에서 제외되는 POS인 경우 true, 아니면 false를 반환한다.
+   * Returns true if the POS is excluded from indexing, false otherwise.
    */
   public abstract boolean isSkippablePos(Pos pos);
   /**
-   * 어절을 구성하는 POS 리스트에서 token으로 뽑히는 POS를 반환한다.
+   * It returns the POS which is extracted from the POS list constituting the word by token.
    */
   public abstract LinkedList<Pos> getTokensFrom(Eojeol eojeol);
 }

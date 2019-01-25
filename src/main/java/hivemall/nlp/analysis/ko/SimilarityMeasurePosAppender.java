@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 /**
- * 문서 유사도 측정용 tokenizer를 위한 PosAppender.
+ * PosAppender for tokenizer for measuring document similarity.
  *
  * @author bibreen <bibreen@gmail.com>
  */
@@ -30,10 +30,10 @@ public class SimilarityMeasurePosAppender extends PosAppender {
   static {
     appendableSet = new HashSet<Appendable>();
 
-    // Appenable HashSet 구성
-    // 사전에 없는 단어(UNKNOWN)은 체언이라고 가정한다.
+    // Configure Appendable HashSet
+    // Assume that a word that is not in the dictionary (UNKNOWN) is a clan.
 
-    // 체언 접두사(XPN) + 체언(N*)
+    // Cene prefix (XPN) + Clan (N*)
     appendableSet.add(new Appendable(PosIdManager.PosId.XPN, PosIdManager.PosId.NNG));
     appendableSet.add(new Appendable(PosIdManager.PosId.XPN, PosIdManager.PosId.NNP));
     appendableSet.add(new Appendable(PosIdManager.PosId.XPN, PosIdManager.PosId.NNB));
@@ -43,7 +43,7 @@ public class SimilarityMeasurePosAppender extends PosAppender {
     appendableSet.add(new Appendable(PosIdManager.PosId.XPN, PosIdManager.PosId.COMPOUND));
     appendableSet.add(new Appendable(PosIdManager.PosId.XPN, PosIdManager.PosId.UNKNOWN));
 
-    // 체언(N*) + 명사 파생 접미사(XSN)
+    // Clan (N*) + Noun Derived Suffix (XSN)
     appendableSet.add(new Appendable(PosIdManager.PosId.NNG, PosIdManager.PosId.XSN));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNP, PosIdManager.PosId.XSN));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNB, PosIdManager.PosId.XSN));
@@ -53,7 +53,7 @@ public class SimilarityMeasurePosAppender extends PosAppender {
     appendableSet.add(new Appendable(PosIdManager.PosId.COMPOUND, PosIdManager.PosId.XSN));
     appendableSet.add(new Appendable(PosIdManager.PosId.UNKNOWN, PosIdManager.PosId.XSN));
 
-    // 외국어(SL), 숫자(SN), 기호(SY)는 모두 연결
+    // Foreign language (SL), number (SN), and symbol (SY)
     appendableSet.add(new Appendable(PosIdManager.PosId.SL, PosIdManager.PosId.SN));
     appendableSet.add(new Appendable(PosIdManager.PosId.SL, PosIdManager.PosId.SY));
     appendableSet.add(new Appendable(PosIdManager.PosId.SN, PosIdManager.PosId.SL));
@@ -109,9 +109,9 @@ public class SimilarityMeasurePosAppender extends PosAppender {
   }
 
   /**
-   * 단독으로 쓰일 수 있는 형태소인지를 판단한다.
+   * Determine whether it is a morpheme that can be used alone.
    *
-   * @param pos 형태소 품사.
+   * @param pos The morpheme part.
    */
   private boolean isAbsolutePos(Pos pos) {
     return false;

@@ -18,7 +18,7 @@ package hivemall.nlp.analysis.ko;
 import java.util.LinkedList;
 
 /**
- * 품사 객체(Pos)를 받아서 어절을 구성하는 클래스.
+ * A class that takes a part-of-speech object (Pos) and constructs a word.
  *
  * @author bibreen <bibreen@gmail.com>
  */
@@ -57,9 +57,8 @@ class Eojeol {
   }
 
   /**
-   * Eojeol에 있는 Pos를 조합하여, Token이 되어야 하는 Pos를 생성한다.
-   * @return token이 있을 경우 Pos의 리스트를 반환하고, 뽑아낼 token이 없을 경우
-   * null을 반환한다.
+   * Combine Pos in Eojeol to generate a Pos to be Token.
+   * @return If there is a token, it returns a list of Pos. If there is no token to be extracted, it returns null.
    */
   public LinkedList<Pos> generateTokens() {
     if (isSkippable()) {

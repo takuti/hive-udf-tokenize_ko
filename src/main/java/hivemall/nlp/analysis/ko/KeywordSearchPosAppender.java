@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 /**
- * 체언과 용언 위주의 인덱싱 tokenizer를 위한 PosAppender.
+ * PosAppender for cognate and predicate indexing tokenizer.
  *
  * @author bibreen <bibreen@gmail.com>
  */
@@ -30,17 +30,17 @@ public class KeywordSearchPosAppender extends PosAppender {
   static {
     appendableSet = new HashSet<Appendable>();
 
-    // Appenable HashSet 구성
-    // 사전에 없는 단어(UNKNOWN)은 체언이라고 가정한다.
+    // Configuring an Appendable HashSet
+    // Assume that a word that is not in the dictionary (UNKNOWN) is a clan.
 
-    // 어미(E) + 어미(E)
+    // Mother (E) + mother (E)
     appendableSet.add(new Appendable(PosIdManager.PosId.E, PosIdManager.PosId.E));
-    // 용언(V*) + E [+ E]*
+    // Verb (V *) + E [+ E]*
     appendableSet.add(new Appendable(PosIdManager.PosId.VV, PosIdManager.PosId.E));
     appendableSet.add(new Appendable(PosIdManager.PosId.VA, PosIdManager.PosId.E));
     appendableSet.add(new Appendable(PosIdManager.PosId.VX, PosIdManager.PosId.E));
 
-    // 체언(N*) + 명사 파생 접미사(XSN)
+    // Clan (N*) + Noun Derived Suffix (XSN)
     appendableSet.add(new Appendable(PosIdManager.PosId.NNG, PosIdManager.PosId.XSN));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNP, PosIdManager.PosId.XSN));
     appendableSet.add(new Appendable(PosIdManager.PosId.NNB, PosIdManager.PosId.XSN));
@@ -50,7 +50,7 @@ public class KeywordSearchPosAppender extends PosAppender {
     appendableSet.add(new Appendable(PosIdManager.PosId.COMPOUND, PosIdManager.PosId.XSN));
     appendableSet.add(new Appendable(PosIdManager.PosId.UNKNOWN, PosIdManager.PosId.XSN));
 
-    // 체언 접두사(XPN) + 체언(N*)
+    // Cene prefix (XPN) + Clan (N*)
     appendableSet.add(new Appendable(PosIdManager.PosId.XPN, PosIdManager.PosId.NNG));
     appendableSet.add(new Appendable(PosIdManager.PosId.XPN, PosIdManager.PosId.NNP));
     appendableSet.add(new Appendable(PosIdManager.PosId.XPN, PosIdManager.PosId.NNB));
@@ -118,9 +118,9 @@ public class KeywordSearchPosAppender extends PosAppender {
   }
 
   /**
-   * 단독으로 쓰일 수 있는 형태소인지를 판단한다.
+   * Determine whether it is a morpheme that can be used alone.
    *
-   * @param pos 형태소 품사.
+   * @param pos The morpheme part.
    */
   private boolean isAbsolutePos(Pos pos) {
     return false;
