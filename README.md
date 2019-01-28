@@ -34,3 +34,5 @@ select tokenize_ko("Hello, world.", "none", array(), true);
 select tokenize_ko("Hello, world.", "none", array(), false);
 -- ["hello","world"]
 ```
+
+Note that other languages, English, Japanese and Chinese, are similarly [supported by Apache Hivemall](http://hivemall.incubator.apache.org/userguide/misc/tokenizer.html).
