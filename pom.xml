@@ -5,16 +5,15 @@
     <artifactId>hive-udf-tokenize_ko</artifactId>
     <version>0.0.1</version>
 
-    <name>Hive Korean NLP UDFs with mecab-ko-dic</name>
-    <description>Extension of Apache Hivemall for Korean NLP</description>
+    <name>Hive tokenize_ko UDF</name>
+    <description>Hive Korean NLP UDFs with mecab-ko-dic</description>
     <url>https://github.com/takuti/hive-udf-tokenize_ko/</url>
     <packaging>jar</packaging>
 
     <properties>
         <hadoop.version>2.4.0</hadoop.version>
         <hive.version>0.13.0</hive.version>
-        <lucene.version>5.5.5</lucene.version>
-        <hivemall.version>0.5.2-incubating</hivemall.version>
+        <lucene.version>7.4.0</lucene.version>
         <java.version>1.7</java.version>
     </properties>
 
@@ -39,38 +38,14 @@
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
+            <artifactId>lucene-analyzers-nori</artifactId>
             <version>${lucene.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hivemall</groupId>
-            <artifactId>hivemall-core</artifactId>
-            <version>${hivemall.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hivemall</groupId>
-            <artifactId>hivemall-nlp</artifactId>
-            <version>${hivemall.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.chasen.mecab</groupId>
-            <artifactId>mecab-java</artifactId>
-            <version>0.996</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -106,9 +81,15 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <createSourcesJar>false</createSourcesJar>
                             <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.apache.lucene</pattern>
+                                    <shadedPattern>me.takuti.hive.nlp.nori</shadedPattern>
+                                </relocation>
+                            </relocations>
                             <filters>
                                 <filter>
-                                    <artifact>org.chasen.mecab:*</artifact>
+                                    <artifact>org.apache.lucene:*</artifact>
                                     <includes>
                                         <include>**</include>
                                     </includes>

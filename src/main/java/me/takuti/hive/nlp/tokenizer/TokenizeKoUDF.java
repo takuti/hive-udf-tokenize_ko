@@ -16,16 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package hivemall.nlp.tokenizer;
+package me.takuti.hive.nlp.tokenizer;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
-import hivemall.nlp.analysis.ko.KoreanAnalyzer;
+import me.takuti.hive.nlp.utils.io.IOUtils;
+import me.takuti.hive.nlp.utils.hadoop.HiveUtils;
 
-import hivemall.utils.io.IOUtils;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -35,29 +39,43 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.Text;
+
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.ko.KoreanAnalyzer;
+import org.apache.lucene.analysis.ko.KoreanPartOfSpeechStopFilter;
+import org.apache.lucene.analysis.ko.KoreanTokenizer;
+import org.apache.lucene.analysis.ko.KoreanTokenizer.DecompoundMode;
+import org.apache.lucene.analysis.ko.POS;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import javax.annotation.Nonnull;
 
 @Description(name = "tokenize_ko",
-        value = "_FUNC_(String line)"
+        value = "_FUNC_(String line [, const string mode = \"discard\", const array<string> stopTags, boolean outputUnknownUnigrams])"
                 + " - returns tokenized strings in array<string>",
         extended = "select tokenize_ko(\"소설 무궁화꽃이 피었습니다.\");\n"
                 + "\n"
-                + "> [\"소설\",\"무궁\",\"무궁화\",\"화\",\"꽃이\",\"꽃\",\"피었습니다\",\"피/VV\"]\n")
+                + "> [\"소설\",\"무궁\",\"화\",\"꽃\",\"피\"]\n")
 @UDFType(deterministic = true, stateful = false)
 public final class TokenizeKoUDF extends GenericUDF {
+
+    private DecompoundMode mode;
+    private Set<POS.Tag> stopTags;
+    private boolean outputUnknownUnigrams;
 
     private transient KoreanAnalyzer analyzer;
 
     @Override
     public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
         final int arglen = arguments.length;
-        if (arglen != 1) {
+        if (arglen < 1 || arglen > 4) {
             throw new UDFArgumentException(
                     "Invalid number of arguments for `tokenize_ko`: " + arglen);
         }
+
+        this.mode = (arglen >= 2) ? parseDecompoundMode(arguments[1]) : KoreanTokenizer.DEFAULT_DECOMPOUND;
+        this.stopTags = (arglen >= 3) ? parseStopTags(arguments[2]) : KoreanPartOfSpeechStopFilter.DEFAULT_STOP_TAGS;
+        this.outputUnknownUnigrams = (arglen >= 4) && HiveUtils.getConstBoolean(arguments[3]);
 
         this.analyzer = null;
 
@@ -68,7 +86,7 @@ public final class TokenizeKoUDF extends GenericUDF {
     @Override
     public List<Text> evaluate(DeferredObject[] arguments) throws HiveException {
         if (analyzer == null) {
-            this.analyzer = new KoreanAnalyzer();
+            this.analyzer = new KoreanAnalyzer(null, mode, stopTags, outputUnknownUnigrams);
         }
 
         Object arg0 = arguments[0].get();
@@ -97,6 +115,52 @@ public final class TokenizeKoUDF extends GenericUDF {
     @Override
     public void close() throws IOException {
         IOUtils.closeQuietly(analyzer);
+    }
+
+    @Nonnull
+    private static DecompoundMode parseDecompoundMode(@Nonnull final ObjectInspector oi) throws UDFArgumentException {
+        String arg = HiveUtils.getConstString(oi);
+        if (arg == null) {
+            return KoreanTokenizer.DEFAULT_DECOMPOUND;
+        }
+        final DecompoundMode mode;
+        try {
+            mode = DecompoundMode.valueOf(arg.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            final StringBuilder sb = new StringBuilder();
+            for (DecompoundMode v : DecompoundMode.values()) {
+                sb.append(v.toString()).append(", ");
+            }
+            throw new UDFArgumentException("Expected either " + sb.toString() + "but got an unexpected mode: " + arg);
+        }
+        return mode;
+    }
+
+    @Nonnull
+    private static Set<POS.Tag> parseStopTags(@Nonnull final ObjectInspector oi) throws UDFArgumentException {
+        if (HiveUtils.isVoidOI(oi)) {
+            return KoreanPartOfSpeechStopFilter.DEFAULT_STOP_TAGS;
+        }
+        final String[] array = HiveUtils.getConstStringArray(oi);
+        if (array == null) {
+            return KoreanPartOfSpeechStopFilter.DEFAULT_STOP_TAGS;
+        }
+        final int length = array.length;
+        if (length == 0) {
+            return Collections.emptySet();
+        }
+        final Set<POS.Tag> stopTags = new HashSet<POS.Tag>(length);
+        for (int i = 0; i < length; i++) {
+            String s = array[i];
+            if (s != null) {
+                try {
+                    stopTags.add(POS.resolveTag(s));
+                } catch (IllegalArgumentException e) {
+                    throw new UDFArgumentException("Unrecognized POS tag has been specified as a stop tag: " + e.getMessage());
+                }
+            }
+        }
+        return stopTags;
     }
 
     private static void analyzeTokens(@Nonnull TokenStream stream, @Nonnull List<Text> results)

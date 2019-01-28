@@ -16,26 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package hivemall.nlp.analysis.ko;
+package me.takuti.hive.nlp.utils.io;
 
-import org.apache.lucene.analysis.TokenFilter;
-import org.apache.lucene.analysis.TokenStream;
-
+import java.io.Closeable;
 import java.io.IOException;
 
-public final class KoreanTokenFilter extends TokenFilter {
+public final class IOUtils {
+    private IOUtils() {}
 
-    public KoreanTokenFilter(TokenStream input) {
-        super(input);
-    }
-
-    @Override
-    public boolean incrementToken() throws IOException {
-        if (input.incrementToken()) {
-            // TODO: Do basic filtering
-            return true;
-        } else {
-            return false;
+    public static void closeQuietly(final Closeable channel) {
+        if (channel != null) {
+            try {
+                channel.close();
+            } catch (IOException e) {
+                ;
+            }
         }
     }
 }
