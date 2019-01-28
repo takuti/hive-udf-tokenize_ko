@@ -56,10 +56,25 @@ public class TokenizeKoUDFTest {
         ObjectInspector[] argOIs = new ObjectInspector[2];
         // line
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        // userDict
+        argOIs[1] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
+        udf.initialize(argOIs);
+        udf.close();
+    }
+
+    @Test
+    public void testThreeArgument() throws UDFArgumentException, IOException {
+        ObjectInspector[] argOIs = new ObjectInspector[3];
+        // line
+        argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        // userDict
+        argOIs[1] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
         // mode
         PrimitiveTypeInfo stringType = new PrimitiveTypeInfo();
         stringType.setTypeName("string");
-        argOIs[1] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
+        argOIs[2] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
                 stringType, null);
         udf.initialize(argOIs);
         udf.close();
@@ -67,13 +82,16 @@ public class TokenizeKoUDFTest {
 
     @Test
     public void testExpectedMode() throws UDFArgumentException, IOException {
-        ObjectInspector[] argOIs = new ObjectInspector[2];
+        ObjectInspector[] argOIs = new ObjectInspector[3];
         // line
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        // userDict
+        argOIs[1] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
         // mode
         PrimitiveTypeInfo stringType = new PrimitiveTypeInfo();
         stringType.setTypeName("string");
-        argOIs[1] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
+        argOIs[2] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
                 stringType, new Text("discard"));
         udf.initialize(argOIs);
         udf.close();
@@ -81,13 +99,16 @@ public class TokenizeKoUDFTest {
 
     @Test(expected = UDFArgumentException.class)
     public void testInvalidMode() throws IOException, HiveException {
-        ObjectInspector[] argOIs = new ObjectInspector[2];
+        ObjectInspector[] argOIs = new ObjectInspector[3];
         // line
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        // userDict
+        argOIs[1] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
         // mode
         PrimitiveTypeInfo stringType = new PrimitiveTypeInfo();
         stringType.setTypeName("string");
-        argOIs[1] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
+        argOIs[2] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
                 stringType, new Text("unsupported mode"));
         udf.initialize(argOIs);
 
@@ -106,39 +127,45 @@ public class TokenizeKoUDFTest {
     }
 
     @Test
-    public void testThreeArgument() throws UDFArgumentException, IOException {
-        ObjectInspector[] argOIs = new ObjectInspector[3];
+    public void testFourArgument() throws UDFArgumentException, IOException {
+        ObjectInspector[] argOIs = new ObjectInspector[4];
         // line
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        // userDict
+        argOIs[1] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
         // mode
         PrimitiveTypeInfo stringType = new PrimitiveTypeInfo();
         stringType.setTypeName("string");
-        argOIs[1] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
+        argOIs[2] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
                 stringType, null);
         // stopTags
-        argOIs[2] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+        argOIs[3] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
                 PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
         udf.initialize(argOIs);
         udf.close();
     }
 
     @Test
-    public void testFourArgument() throws UDFArgumentException, IOException {
-        ObjectInspector[] argOIs = new ObjectInspector[4];
+    public void testFiveArgument() throws UDFArgumentException, IOException {
+        ObjectInspector[] argOIs = new ObjectInspector[5];
         // line
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        // userDict
+        argOIs[1] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
         // mode
         PrimitiveTypeInfo stringType = new PrimitiveTypeInfo();
         stringType.setTypeName("string");
-        argOIs[1] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
+        argOIs[2] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
                 stringType, null);
         // stopTags
-        argOIs[2] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+        argOIs[3] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
                 PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
         // outputUnknowUnigrams
         PrimitiveTypeInfo booleanType = new PrimitiveTypeInfo();
         booleanType.setTypeName("boolean");
-        argOIs[3] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
+        argOIs[4] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
                 booleanType, new BooleanWritable(true));
         udf.initialize(argOIs);
         udf.close();

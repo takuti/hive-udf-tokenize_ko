@@ -19,6 +19,8 @@
 package me.takuti.hive.nlp.tokenizer;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,18 +48,23 @@ import org.apache.lucene.analysis.ko.KoreanPartOfSpeechStopFilter;
 import org.apache.lucene.analysis.ko.KoreanTokenizer;
 import org.apache.lucene.analysis.ko.KoreanTokenizer.DecompoundMode;
 import org.apache.lucene.analysis.ko.POS;
+import org.apache.lucene.analysis.ko.dict.UserDictionary;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @Description(name = "tokenize_ko",
-        value = "_FUNC_(String line [, const string mode = \"discard\", const array<string> stopTags, boolean outputUnknownUnigrams])"
+        value = "_FUNC_(String line [, const array<string> userDict, const string mode = \"discard\", const array<string> stopTags, boolean outputUnknownUnigrams])"
                 + " - returns tokenized strings in array<string>",
         extended = "select tokenize_ko(\"소설 무궁화꽃이 피었습니다.\");\n"
                 + "\n"
                 + "> [\"소설\",\"무궁\",\"화\",\"꽃\",\"피\"]\n")
 @UDFType(deterministic = true, stateful = false)
 public final class TokenizeKoUDF extends GenericUDF {
+
+    @Nullable
+    private UserDictionary userDict;
 
     private DecompoundMode mode;
     private Set<POS.Tag> stopTags;
@@ -68,14 +75,15 @@ public final class TokenizeKoUDF extends GenericUDF {
     @Override
     public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
         final int arglen = arguments.length;
-        if (arglen < 1 || arglen > 4) {
+        if (arglen < 1 || arglen > 5) {
             throw new UDFArgumentException(
                     "Invalid number of arguments for `tokenize_ko`: " + arglen);
         }
 
-        this.mode = (arglen >= 2) ? parseDecompoundMode(arguments[1]) : KoreanTokenizer.DEFAULT_DECOMPOUND;
-        this.stopTags = (arglen >= 3) ? parseStopTags(arguments[2]) : KoreanPartOfSpeechStopFilter.DEFAULT_STOP_TAGS;
-        this.outputUnknownUnigrams = (arglen >= 4) && HiveUtils.getConstBoolean(arguments[3]);
+        this.userDict = (arglen >= 3) ? parseUserDict(arguments[1]) : null;
+        this.mode = (arglen >= 3) ? parseDecompoundMode(arguments[2]) : KoreanTokenizer.DEFAULT_DECOMPOUND;
+        this.stopTags = (arglen >= 4) ? parseStopTags(arguments[3]) : KoreanPartOfSpeechStopFilter.DEFAULT_STOP_TAGS;
+        this.outputUnknownUnigrams = (arglen >= 5) && HiveUtils.getConstBoolean(arguments[4]);
 
         this.analyzer = null;
 
@@ -86,7 +94,7 @@ public final class TokenizeKoUDF extends GenericUDF {
     @Override
     public List<Text> evaluate(DeferredObject[] arguments) throws HiveException {
         if (analyzer == null) {
-            this.analyzer = new KoreanAnalyzer(null, mode, stopTags, outputUnknownUnigrams);
+            this.analyzer = new KoreanAnalyzer(userDict, mode, stopTags, outputUnknownUnigrams);
         }
 
         Object arg0 = arguments[0].get();
@@ -115,6 +123,38 @@ public final class TokenizeKoUDF extends GenericUDF {
     @Override
     public void close() throws IOException {
         IOUtils.closeQuietly(analyzer);
+    }
+
+    @Nullable
+    private static UserDictionary parseUserDict(@Nonnull final ObjectInspector oi)
+            throws UDFArgumentException {
+        if (HiveUtils.isVoidOI(oi)) {
+            return null;
+        }
+        final String[] array = HiveUtils.getConstStringArray(oi);
+        if (array == null) {
+            return null;
+        }
+        final int length = array.length;
+        if (length == 0) {
+            return null;
+        }
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            String row = array[i];
+            if (row != null) {
+                builder.append(row).append('\n');
+            }
+        }
+
+        final Reader reader = new StringReader(builder.toString());
+        try {
+            return UserDictionary.open(reader); // return null if empty
+        } catch (Throwable e) {
+            throw new UDFArgumentException(
+                    "Failed to create user dictionary based on the given array<string>: "
+                            + builder.toString());
+        }
     }
 
     @Nonnull
