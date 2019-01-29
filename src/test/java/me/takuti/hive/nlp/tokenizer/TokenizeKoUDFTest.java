@@ -45,15 +45,31 @@ public class TokenizeKoUDFTest {
     }
 
     @Test
-    public void testOneArgument() throws UDFArgumentException, IOException {
+    public void test() throws HiveException, IOException {
         ObjectInspector[] argOIs = new ObjectInspector[1];
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
         udf.initialize(argOIs);
+
+        GenericUDF.DeferredObject[] args = new GenericUDF.DeferredObject[1];
+        args[0] = new GenericUDF.DeferredObject() {
+            public Text get() throws HiveException {
+                return new Text("소설 무궁화꽃이 피었습니다.");
+            }
+
+            @Override
+            public void prepare(int arg) throws HiveException {}
+        };
+        List<Text> tokens = udf.evaluate(args);
+
+        Assert.assertNotNull(tokens);
+        Assert.assertEquals(5, tokens.size());
+        Assert.assertEquals("소설 무궁 화 꽃 피", getString(tokens));
+
         udf.close();
     }
 
     @Test
-    public void testTwoArgument() throws UDFArgumentException, IOException {
+    public void testNullUserList() throws HiveException, IOException {
         ObjectInspector[] argOIs = new ObjectInspector[2];
         // line
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
@@ -61,11 +77,27 @@ public class TokenizeKoUDFTest {
         argOIs[1] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
                 PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
         udf.initialize(argOIs);
+
+        GenericUDF.DeferredObject[] args = new GenericUDF.DeferredObject[1];
+        args[0] = new GenericUDF.DeferredObject() {
+            public Text get() throws HiveException {
+                return new Text("I enjoy C++ programming.");
+            }
+
+            @Override
+            public void prepare(int arg) throws HiveException {}
+        };
+        List<Text> tokens = udf.evaluate(args);
+
+        Assert.assertNotNull(tokens);
+        Assert.assertEquals(4, tokens.size());
+        Assert.assertEquals("i enjoy c programming", getString(tokens));
+
         udf.close();
     }
 
     @Test
-    public void testThreeArgument() throws UDFArgumentException, IOException {
+    public void testNullMode() throws UDFArgumentException, IOException {
         ObjectInspector[] argOIs = new ObjectInspector[3];
         // line
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
@@ -82,7 +114,7 @@ public class TokenizeKoUDFTest {
     }
 
     @Test
-    public void testExpectedMode() throws UDFArgumentException, IOException {
+    public void testMode() throws HiveException, IOException {
         ObjectInspector[] argOIs = new ObjectInspector[3];
         // line
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
@@ -93,8 +125,24 @@ public class TokenizeKoUDFTest {
         PrimitiveTypeInfo stringType = new PrimitiveTypeInfo();
         stringType.setTypeName("string");
         argOIs[2] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
-                stringType, new Text("discard"));
+                stringType, new Text("mixed"));
         udf.initialize(argOIs);
+
+        GenericUDF.DeferredObject[] args = new GenericUDF.DeferredObject[1];
+        args[0] = new GenericUDF.DeferredObject() {
+            public Text get() throws HiveException {
+                return new Text("소설 무궁화꽃이 피었습니다.");
+            }
+
+            @Override
+            public void prepare(int arg) throws HiveException {}
+        };
+        List<Text> tokens = udf.evaluate(args);
+
+        Assert.assertNotNull(tokens);
+        Assert.assertEquals(6, tokens.size());
+        Assert.assertEquals("소설 무궁화 무궁 화 꽃 피", getString(tokens));
+
         udf.close();
     }
 
@@ -116,27 +164,40 @@ public class TokenizeKoUDFTest {
     }
 
     @Test
-    public void testFourArgument() throws UDFArgumentException, IOException {
-        ObjectInspector[] argOIs = new ObjectInspector[4];
+    public void testNonnullUserList() throws HiveException, IOException {
+        ObjectInspector[] argOIs = new ObjectInspector[3];
         // line
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
         // userDict
         argOIs[1] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
-                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, Arrays.asList("C++"));
         // mode
         PrimitiveTypeInfo stringType = new PrimitiveTypeInfo();
         stringType.setTypeName("string");
         argOIs[2] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
-                stringType, null);
-        // stopTags
-        argOIs[3] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
-                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
+                stringType, new Text("mixed"));
         udf.initialize(argOIs);
+
+        GenericUDF.DeferredObject[] args = new GenericUDF.DeferredObject[1];
+        args[0] = new GenericUDF.DeferredObject() {
+            public Text get() throws HiveException {
+                return new Text("I enjoy C++ programming.");
+            }
+
+            @Override
+            public void prepare(int arg) throws HiveException {}
+        };
+        List<Text> tokens = udf.evaluate(args);
+
+        Assert.assertNotNull(tokens);
+        Assert.assertEquals(4, tokens.size());
+        Assert.assertEquals("i enjoy c++ programming", getString(tokens));
+
         udf.close();
     }
 
     @Test
-    public void testValidStopTag() throws UDFArgumentException, IOException {
+    public void testStopTags() throws HiveException, IOException {
         ObjectInspector[] argOIs = new ObjectInspector[4];
         // line
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
@@ -150,8 +211,24 @@ public class TokenizeKoUDFTest {
                 stringType, null);
         // stopTags
         argOIs[3] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
-                PrimitiveObjectInspectorFactory.javaStringObjectInspector, Arrays.asList("E"));
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, Arrays.asList("E", "VV"));
         udf.initialize(argOIs);
+
+        GenericUDF.DeferredObject[] args = new GenericUDF.DeferredObject[1];
+        args[0] = new GenericUDF.DeferredObject() {
+            public Text get() throws HiveException {
+                return new Text("소설 무궁화꽃이 피었습니다.");
+            }
+
+            @Override
+            public void prepare(int arg) throws HiveException {}
+        };
+        List<Text> tokens = udf.evaluate(args);
+
+        Assert.assertNotNull(tokens);
+        Assert.assertEquals(5, tokens.size());
+        Assert.assertEquals("소설 무궁 화 꽃 이", getString(tokens));
+
         udf.close();
     }
 
@@ -176,7 +253,7 @@ public class TokenizeKoUDFTest {
     }
 
     @Test
-    public void testFiveArgument() throws UDFArgumentException, IOException {
+    public void testOutputUnknownUnigramsTrue() throws HiveException, IOException {
         ObjectInspector[] argOIs = new ObjectInspector[5];
         // line
         argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
@@ -197,19 +274,11 @@ public class TokenizeKoUDFTest {
         argOIs[4] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
                 booleanType, new BooleanWritable(true));
         udf.initialize(argOIs);
-        udf.close();
-    }
-
-    @Test
-    public void testEvaluateOneRow() throws IOException, HiveException {
-        ObjectInspector[] argOIs = new ObjectInspector[1];
-        argOIs[0] = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
-        udf.initialize(argOIs);
 
         GenericUDF.DeferredObject[] args = new GenericUDF.DeferredObject[1];
         args[0] = new GenericUDF.DeferredObject() {
             public Text get() throws HiveException {
-                return new Text("소설 무궁화꽃이 피었습니다.");
+                return new Text("Hello, world.");
             }
 
             @Override
@@ -218,8 +287,49 @@ public class TokenizeKoUDFTest {
         List<Text> tokens = udf.evaluate(args);
 
         Assert.assertNotNull(tokens);
-        Assert.assertEquals(5, tokens.size());
-        Assert.assertEquals("소설 무궁 화 꽃 피", getString(tokens));
+        Assert.assertEquals(10, tokens.size());
+        Assert.assertEquals("h e l l o w o r l d", getString(tokens));
+
+        udf.close();
+    }
+
+    @Test
+    public void testOutputUnknownUnigramsFalse() throws HiveException, IOException {
+        ObjectInspector[] argOIs = new ObjectInspector[5];
+        // line
+        argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        // userDict
+        argOIs[1] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
+        // mode
+        PrimitiveTypeInfo stringType = new PrimitiveTypeInfo();
+        stringType.setTypeName("string");
+        argOIs[2] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
+                stringType, null);
+        // stopTags
+        argOIs[3] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
+        // outputUnknowUnigrams
+        PrimitiveTypeInfo booleanType = new PrimitiveTypeInfo();
+        booleanType.setTypeName("boolean");
+        argOIs[4] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
+                booleanType, new BooleanWritable(false));
+        udf.initialize(argOIs);
+
+        GenericUDF.DeferredObject[] args = new GenericUDF.DeferredObject[1];
+        args[0] = new GenericUDF.DeferredObject() {
+            public Text get() throws HiveException {
+                return new Text("Hello, world.");
+            }
+
+            @Override
+            public void prepare(int arg) throws HiveException {}
+        };
+        List<Text> tokens = udf.evaluate(args);
+
+        Assert.assertNotNull(tokens);
+        Assert.assertEquals(2, tokens.size());
+        Assert.assertEquals("hello world", getString(tokens));
 
         udf.close();
     }
