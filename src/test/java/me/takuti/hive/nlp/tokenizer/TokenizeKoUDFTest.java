@@ -111,18 +111,6 @@ public class TokenizeKoUDFTest {
         argOIs[2] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
                 stringType, new Text("unsupported mode"));
         udf.initialize(argOIs);
-
-        GenericUDF.DeferredObject[] args = new GenericUDF.DeferredObject[1];
-        args[0] = new GenericUDF.DeferredObject() {
-            public Text get() throws HiveException {
-                return new Text("여보세요");
-            }
-
-            @Override
-            public void prepare(int arg) throws HiveException {}
-        };
-        udf.evaluate(args);
-
         udf.close();
     }
 
