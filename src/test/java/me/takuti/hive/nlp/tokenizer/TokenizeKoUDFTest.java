@@ -19,6 +19,7 @@
 package me.takuti.hive.nlp.tokenizer;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
@@ -130,6 +131,46 @@ public class TokenizeKoUDFTest {
         // stopTags
         argOIs[3] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
                 PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
+        udf.initialize(argOIs);
+        udf.close();
+    }
+
+    @Test
+    public void testValidStopTag() throws UDFArgumentException, IOException {
+        ObjectInspector[] argOIs = new ObjectInspector[4];
+        // line
+        argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        // userDict
+        argOIs[1] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
+        // mode
+        PrimitiveTypeInfo stringType = new PrimitiveTypeInfo();
+        stringType.setTypeName("string");
+        argOIs[2] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
+                stringType, null);
+        // stopTags
+        argOIs[3] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, Arrays.asList("E"));
+        udf.initialize(argOIs);
+        udf.close();
+    }
+
+    @Test(expected = UDFArgumentException.class)
+    public void testInvalidStopTag() throws UDFArgumentException, IOException {
+        ObjectInspector[] argOIs = new ObjectInspector[4];
+        // line
+        argOIs[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        // userDict
+        argOIs[1] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, null);
+        // mode
+        PrimitiveTypeInfo stringType = new PrimitiveTypeInfo();
+        stringType.setTypeName("string");
+        argOIs[2] = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
+                stringType, null);
+        // stopTags
+        argOIs[3] = ObjectInspectorFactory.getStandardConstantListObjectInspector(
+                PrimitiveObjectInspectorFactory.javaStringObjectInspector, Arrays.asList("E", "?"));
         udf.initialize(argOIs);
         udf.close();
     }
