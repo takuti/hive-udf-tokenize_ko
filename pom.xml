@@ -86,6 +86,10 @@
                                     <pattern>org.apache.lucene</pattern>
                                     <shadedPattern>me.takuti.hive.nlp.nori</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>org.tartarus.snowball</pattern>
+                                    <shadedPattern>me.takuti.hive.nlp.snowball</shadedPattern>
+                                </relocation>
                             </relocations>
                             <filters>
                                 <filter>
