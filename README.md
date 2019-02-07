@@ -4,7 +4,12 @@ Korean NLP on Hive
 Tokenize Korean sentences on Hive.
 
 ```
-tokenize_ko(String line [, const string mode = "discard", const array<string> stopTags, boolean outputUnknownUnigrams]) - returns tokenized strings in array<string>
+tokenize_ko(String line [,
+            const array<string> userDict,
+            const string mode = "discard",
+            const array<string> stopTags,
+            boolean outputUnknownUnigrams
+           ]) - returns tokenized strings in array<string>
 ```
 
 Implementation is based on [Lucene Korean analyzer](https://lucene.apache.org/core/7_4_0/analyzers-nori/org/apache/lucene/analysis/ko/KoreanAnalyzer.html).
